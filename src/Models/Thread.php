@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Laravel Messageable.
+ *
+ * (c) DraperStudio <hello@draperstudio.tech>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace DraperStudio\Messageable\Models;
 
 use Carbon\Carbon;
@@ -7,41 +16,75 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Class Thread.
+ *
+ * @author DraperStudio <hello@draperstudio.tech>
+ */
 class Thread extends Model
 {
     use SoftDeletes;
 
+    /**
+     * @var string
+     */
     protected $table = 'threads';
 
+    /**
+     * @var array
+     */
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    /**
+     * @var array
+     */
     protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function messages()
     {
         return $this->hasMany(Message::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function participants()
     {
         return $this->hasMany(Participant::class);
     }
 
+    /**
+     * @return mixed
+     */
     public function creator()
     {
         return $this->messages()->oldest()->first()->creator;
     }
 
+    /**
+     * @return mixed
+     */
     public function getLatestMessage()
     {
         return $this->messages()->latest()->first();
     }
 
+    /**
+     * @return mixed
+     */
     public static function getAllLatest()
     {
         return static::latest('updated_at');
     }
 
+    /**
+     * @param null $participant
+     *
+     * @return array
+     */
     public function participantsIdsAndTypes($participant = null)
     {
         $participants = $this->participants()
@@ -55,6 +98,12 @@ class Thread extends Model
         return $participants;
     }
 
+    /**
+     * @param $query
+     * @param $participant
+     *
+     * @return mixed
+     */
     public function scopeForModel($query, $participant)
     {
         return $query->join('participants', 'threads.id', '=', 'participants.thread_id')
@@ -64,6 +113,12 @@ class Thread extends Model
             ->select('threads.*');
     }
 
+    /**
+     * @param $query
+     * @param $participant
+     *
+     * @return mixed
+     */
     public function scopeForModelWithNewMessages($query, $participant)
     {
         return $query->join('participants', 'threads.id', '=', 'participants.thread_id')
@@ -77,6 +132,12 @@ class Thread extends Model
             ->select('threads.*');
     }
 
+    /**
+     * @param $data
+     * @param Model $creator
+     *
+     * @return $this
+     */
     public function addMessage($data, Model $creator)
     {
         $message = (new Message())->fill(array_merge($data, [
@@ -89,6 +150,9 @@ class Thread extends Model
         return $message;
     }
 
+    /**
+     * @param array $messages
+     */
     public function addMessages(array $messages)
     {
         foreach ($messages as $message) {
@@ -96,6 +160,11 @@ class Thread extends Model
         }
     }
 
+    /**
+     * @param Model $participant
+     *
+     * @return $this|Model
+     */
     public function addParticipant(Model $participant)
     {
         $participant = (new Participant())->fill([
@@ -109,6 +178,9 @@ class Thread extends Model
         return $participant;
     }
 
+    /**
+     * @param array $participants
+     */
     public function addParticipants(array $participants)
     {
         foreach ($participants as $participant) {
@@ -116,6 +188,9 @@ class Thread extends Model
         }
     }
 
+    /**
+     * @param $userId
+     */
     public function markAsRead($userId)
     {
         try {
@@ -127,6 +202,11 @@ class Thread extends Model
         }
     }
 
+    /**
+     * @param $participant
+     *
+     * @return bool
+     */
     public function isUnread($participant)
     {
         try {
@@ -142,6 +222,11 @@ class Thread extends Model
         return false;
     }
 
+    /**
+     * @param $participant
+     *
+     * @return mixed
+     */
     public function getParticipantFromModel($participant)
     {
         return $this->participants()
@@ -150,6 +235,9 @@ class Thread extends Model
                     ->firstOrFail();
     }
 
+    /**
+     *
+     */
     public function activateAllParticipants()
     {
         $participants = $this->participants()->withTrashed()->get();
@@ -159,6 +247,11 @@ class Thread extends Model
         }
     }
 
+    /**
+     * @param $participant
+     *
+     * @return bool
+     */
     public function hasParticipant($participant)
     {
         return $this->participants()
