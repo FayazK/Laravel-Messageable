@@ -11,9 +11,6 @@ use Illuminate\Database\Schema\Blueprint;
  */
 class CreateThreadsTable extends Migration
 {
-    /**
-     *
-     */
     public function up()
     {
         Schema::create('threads', function (Blueprint $table) {
@@ -24,9 +21,6 @@ class CreateThreadsTable extends Migration
         });
     }
 
-    /**
-     *
-     */
     public function down()
     {
         Schema::dropIfExists('threads');

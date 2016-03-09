@@ -235,9 +235,6 @@ class Thread extends Model
                     ->firstOrFail();
     }
 
-    /**
-     *
-     */
     public function activateAllParticipants()
     {
         $participants = $this->participants()->withTrashed()->get();
