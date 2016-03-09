@@ -11,9 +11,6 @@ use Illuminate\Database\Schema\Blueprint;
  */
 class CreateMessagesTable extends Migration
 {
-    /**
-     *
-     */
     public function up()
     {
         Schema::create('messages', function (Blueprint $table) {
@@ -26,9 +23,6 @@ class CreateMessagesTable extends Migration
         });
     }
 
-    /**
-     *
-     */
     public function down()
     {
         Schema::dropIfExists('messages');
